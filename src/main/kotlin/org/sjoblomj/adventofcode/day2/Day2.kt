@@ -11,7 +11,7 @@ private const val inputFile = "src/main/resources/inputs/day2.txt"
 
 fun day2(): Pair<Int, Int> {
 	val content = readFile(inputFile)[0].toIntList()
-	val program = initializeProgram(content, 12, 2).toMutableList()
+	val program = initializeProgram(content, 12, 2)
 	val programOutput = calculateProgramOutput(program)
 	println("The program output is $programOutput")
 
@@ -24,30 +24,30 @@ fun day2(): Pair<Int, Int> {
 
 internal fun nounAndVerbCalculation(noun: Int, verb: Int) = 100 * noun + verb
 
-internal fun initializeProgram(content: MutableList<Int>, noun: Int, verb: Int) =
+internal fun initializeProgram(content: List<Int>, noun: Int, verb: Int) =
 	listOf(content[0], noun, verb)
 		.plus(content.subList(3, content.size))
 
-internal fun calculateProgramOutput(input: MutableList<Int>) = calculateOpcodes(input)[0]
+internal fun calculateProgramOutput(program: List<Int>) = calculateOpcodes(program.toMutableList())[0]
 
-internal fun calculateOpcodes(program: MutableList<Int>): List<Int> {
-	loop@ for (ip in (0 until program.size) step 4) {
+internal fun calculateOpcodes(prg: MutableList<Int>): List<Int> {
+	loop@ for (ip in (0 until prg.size) step 4) {
 		when {
-			program[ip] == OPCODE_ADD  -> program[program[ip + 3]] = program[program[ip + 1]] + program[program[ip + 2]]
-			program[ip] == OPCODE_MUL  -> program[program[ip + 3]] = program[program[ip + 1]] * program[program[ip + 2]]
-			program[ip] == OPCODE_EXIT -> break@loop
-			else                       -> throw IllegalArgumentException("Unexpected data at position $ip: ${program[ip]}")
+			prg[ip] == OPCODE_ADD  -> prg[prg[ip + 3]] = prg[prg[ip + 1]] + prg[prg[ip + 2]]
+			prg[ip] == OPCODE_MUL  -> prg[prg[ip + 3]] = prg[prg[ip + 1]] * prg[prg[ip + 2]]
+			prg[ip] == OPCODE_EXIT -> break@loop
+			else                   -> throw IllegalArgumentException("Unexpected data at position $ip: ${prg[ip]}")
 		}
 	}
-	return program
+	return prg
 }
 
 
-internal fun findInputPair(input: MutableList<Int>, wantedOutput: Int, maxValue: Int = 100): Pair<Int, Int> {
+internal fun findInputPair(input: List<Int>, wantedOutput: Int, maxValue: Int = 100): Pair<Int, Int> {
 	for (noun in (0 until maxValue)) {
 		for (verb in (0 until maxValue)) {
 
-			val program = initializeProgram(input, noun, verb).toMutableList()
+			val program = initializeProgram(input, noun, verb)
 			if (calculateProgramOutput(program) == wantedOutput) {
 				return noun to verb
 			}
@@ -60,4 +60,3 @@ internal fun findInputPair(input: MutableList<Int>, wantedOutput: Int, maxValue:
 internal fun String.toIntList() = this
 	.split(",")
 	.map { it.toInt() }
-	.toMutableList()
