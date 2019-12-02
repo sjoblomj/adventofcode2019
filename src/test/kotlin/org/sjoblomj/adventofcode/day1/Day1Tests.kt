@@ -6,6 +6,12 @@ import kotlin.test.assertEquals
 class Day1Tests {
 
 	@Test
+	fun `Calculates the correct answers`() {
+		assertEquals(Pair(3226822, 4837367), day1())
+	}
+
+
+	@Test
 	fun `Can calculate fuel for single mass`() {
 		assertEquals(2, calculateFuelGivenMass(12))
 		assertEquals(2, calculateFuelGivenMass(14))

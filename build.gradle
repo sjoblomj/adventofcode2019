@@ -53,4 +53,5 @@ apply plugin: 'info.solidsoft.pitest'
 
 pitest {
 	targetClasses = ['org.sjoblomj.adventofcode.*']
+	excludedClasses = ['org.sjoblomj.adventofcode.MainKt']
 }

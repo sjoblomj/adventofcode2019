@@ -1,20 +1,18 @@
 package org.sjoblomj.adventofcode.day1
 
 import org.sjoblomj.adventofcode.readFile
-import kotlin.system.measureTimeMillis
 
 private const val inputFile = "src/main/resources/inputs/day1.txt"
 
-fun day1() {
-	println("== DAY 1 ==")
-	val timeTaken = measureTimeMillis { calculateAndPrintDay1() }
-	println("Finished Day 1 in $timeTaken ms\n")
-}
-
-fun calculateAndPrintDay1() {
+fun day1(): Pair<Int, Int> {
 	val content = readFile(inputFile).map { it.toInt() }
-	println("The fuel for the masses is ${calculateFuelGivenMasses(content)}")
-	println("The total fuel required is ${calculateTotalFuelGivenMasses(content)}")
+	val fuelGivenMasses = calculateFuelGivenMasses(content)
+	val totalFuelGivenMasses = calculateTotalFuelGivenMasses(content)
+
+	println("The fuel for the masses is $fuelGivenMasses")
+	println("The total fuel required is $totalFuelGivenMasses")
+
+	return fuelGivenMasses to totalFuelGivenMasses
 }
 
 internal fun calculateFuelGivenMasses(masses: List<Int>) = masses.map { calculateFuelGivenMass(it) }.sum()
