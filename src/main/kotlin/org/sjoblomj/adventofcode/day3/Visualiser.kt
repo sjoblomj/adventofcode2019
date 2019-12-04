@@ -1,6 +1,6 @@
 package org.sjoblomj.adventofcode.day3
 
-import java.lang.IllegalArgumentException
+import org.sjoblomj.adventofcode.day3.Instruction.Direction.*
 
 
 fun visualise(firstInstructions: String, secondInstructions: String = ""): String {
@@ -35,23 +35,22 @@ private fun createSymbolMap(symbols: HashMap<Coord, Char>, instructions: String)
 
 	for (instruction in createInstructionList(instructions)) {
 		when (instruction.direction) {
-			'R' -> {
+			R -> {
 				(0 until instruction.steps - 1).forEach { _ -> insert(symbols, Coord(++x, y), '-') }
 				insert(symbols, Coord(++x, y), '+')
 			}
-			'L' -> {
+			L -> {
 				(0 until instruction.steps - 1).forEach { _ -> insert(symbols, Coord(--x, y), '-') }
 				insert(symbols, Coord(--x, y), '+')
 			}
-			'U' -> {
+			U -> {
 				(0 until instruction.steps - 1).forEach { _ -> insert(symbols, Coord(x, ++y), '|') }
 				insert(symbols, Coord(x, ++y), '+')
 			}
-			'D' -> {
+			D -> {
 				(0 until instruction.steps - 1).forEach { _ -> insert(symbols, Coord(x, --y), '|') }
 				insert(symbols, Coord(x, --y), '+')
 			}
-			else -> throw IllegalArgumentException("Could not parse '${instruction.direction}${instruction.steps}'")
 		}
 	}
 	symbols[Coord(0, 0)] = 'o'

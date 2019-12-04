@@ -14,7 +14,7 @@ class Day3Tests {
 
 	@Test
 	fun `Empty instructions will return a list of the origin`() {
-		assertEquals(listOf(Coord(0, 0)), instructionsToCoordinates(""))
+		assertEquals(listOf(Coord(0, 0)), instructionsToCoordinates(createInstructionList("")))
 	}
 
 	@Test
@@ -24,13 +24,13 @@ class Day3Tests {
 			Coord(8, 1), Coord(8, 2), Coord(8, 3), Coord(8, 4), Coord(8, 5),
 			Coord(7, 5), Coord(6, 5), Coord(5, 5), Coord(4, 5), Coord(3, 5),
 			Coord(3, 4), Coord(3, 3), Coord(3, 2)
-			), instructionsToCoordinates("R8,U5,L5,D3"))
+			), instructionsToCoordinates(createInstructionList("R8,U5,L5,D3")))
 	}
 
 	@Test
 	fun `Throws Exception on invalid instruction`() {
 		assertFailsWith(IllegalArgumentException::class) {
-			instructionsToCoordinates("R8,G5,L5,D3")
+			instructionsToCoordinates(createInstructionList("R8,G5,L5,D3"))
 		}
 		assertFailsWith(IllegalArgumentException::class) {
 			visualise("R8,G5,L5,D3")
@@ -85,8 +85,5 @@ class Day3Tests {
 		assertEquals(410, findSteps(toCoords("R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51"), toCoords("U98,R91,D20,R16,D67,R40,U7,R15,U6,R7")))
 	}
 
-	/**
-	 * Shorter function name to make tests more readable
-	 */
-	private fun toCoords(str: String) = instructionsToCoordinates(str)
+	private fun toCoords(str: String) = instructionsToCoordinates(createInstructionList(str))
 }
