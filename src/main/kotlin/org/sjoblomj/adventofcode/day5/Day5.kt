@@ -12,13 +12,23 @@ private const val inputFile = "src/main/resources/inputs/day5.txt"
 fun day5(): Pair<Int, Int> {
 	val content = readFile(inputFile)[0]
 
-	calculateOpcodes(content)
+	val result1 = calculateOpcodes(content, 1)
+	val result5 = calculateOpcodes(content, 5)
+	val diagnosticCodes = result1.subList(0, result1.size - 1)
+	val airConditionerUnitDiagnosticCode = result1.last()
+	val thermalRadiatorControllerDiagnosticCode = result5.last()
 
-	return Pair(-1, -1)
+	if (diagnosticCodes.any { it != 0 })
+		println("ERROR: Diagnostic test failed! $diagnosticCodes")
+
+	println("Diagnostic code for the air conditioner unit: $airConditionerUnitDiagnosticCode")
+	println("Diagnostic code for the thermal radiator controller: $thermalRadiatorControllerDiagnosticCode")
+
+	return Pair(airConditionerUnitDiagnosticCode, thermalRadiatorControllerDiagnosticCode)
 }
 
 
-internal fun calculateOpcodes(opcodes: String, inputValue: Int = 1) = calculateOpcodes(opcodes.toIntList().toMutableList(), inputValue)
+internal fun calculateOpcodes(opcodes: String, inputValue: Int) = calculateOpcodes(opcodes.toIntList().toMutableList(), inputValue)
 
 internal fun calculateOpcodes(prg: MutableList<Int>, inputValue: Int): List<Int> {
 	val outputs = mutableListOf<Int>()
@@ -33,28 +43,27 @@ internal fun calculateOpcodes(prg: MutableList<Int>, inputValue: Int): List<Int>
 			LESS_THAN -> { applyTwoParamOperation(instruction, prg, ip) { a, b -> if (a <  b) 1 else 0 }; ip += numOfParams }
 			EQUALS    -> { applyTwoParamOperation(instruction, prg, ip) { a, b -> if (a == b) 1 else 0 }; ip += numOfParams }
 
-			JUMP_IF_TRUE  -> { ip = jumpOperation(instruction, prg, ip) { it != 0 } ?: ip + numOfParams }
-			JUMP_IF_FALSE -> { ip = jumpOperation(instruction, prg, ip) { it == 0 } ?: ip + numOfParams }
+			JUMP_IF_TRUE  -> { ip = jumpOperation(instruction, prg, ip) { it != 0 } }
+			JUMP_IF_FALSE -> { ip = jumpOperation(instruction, prg, ip) { it == 0 } }
 
 			INPUT  -> { prg[prg[ip + 1]] = inputValue; ip += numOfParams }
-			OUTPUT -> { outputs.add(prg[prg[ip + 1]]); ip += numOfParams }
+			OUTPUT -> { outputs.add(instruction.getValue(prg, ip, 1)); ip += numOfParams }
 			STOP   -> { ip = prg.size }
 		}
 		if (ip >= prg.size)
 			break
 	}
-	println(outputs)
-	return prg
+	return outputs
 }
 
-private fun jumpOperation(instruction: Instruction, prg: List<Int>, ip: Int, comparator: (Int) -> Boolean): Int? {
+private fun jumpOperation(instruction: Instruction, prg: List<Int>, ip: Int, comparator: (Int) -> Boolean): Int {
 	val p1 = instruction.getValue(prg, ip, 1)
 	val p2 = instruction.getValue(prg, ip, 2)
 
 	return if (comparator.invoke(p1)) {
 		p2
 	} else {
-		null
+		ip + instruction.instructionType.numberOfParameters
 	}
 }
 
@@ -96,18 +105,9 @@ internal class Instruction(opcode: Int) {
 	}
 
 	private fun parseInstructionType(instructionType: String): InstructionType {
-		return when (instructionType) {
-			"01" -> ADD
-			"02" -> MUL
-			"03" -> INPUT
-			"04" -> OUTPUT
-			"05" -> JUMP_IF_TRUE
-			"06" -> JUMP_IF_FALSE
-			"07" -> LESS_THAN
-			"08" -> EQUALS
-			"99" -> STOP
-			else -> throw IllegalArgumentException("Could not recognise instruction type '$instructionType'")
-		}
+		return values()
+			.firstOrNull { it.opcode == instructionType }
+			?: throw IllegalArgumentException("Could not recognise instruction type '$instructionType'")
 	}
 
 	private fun parseInstructionMode(instructionMode: Int): InstructionMode {
@@ -119,16 +119,16 @@ internal class Instruction(opcode: Int) {
 	}
 
 	enum class InstructionMode { POSITION, IMMEDIATE }
-	enum class InstructionType(val numberOfParameters: Int) {
-		ADD(4),
-		MUL(4),
-		INPUT(2),
-		OUTPUT(2),
-		JUMP_IF_TRUE(3),
-		JUMP_IF_FALSE(3),
-		LESS_THAN(4),
-		EQUALS(4),
-		STOP(1);
+	enum class InstructionType(val numberOfParameters: Int, val opcode: String) {
+		ADD(4, "01"),
+		MUL(4, "02"),
+		INPUT(2, "03"),
+		OUTPUT(2, "04"),
+		JUMP_IF_TRUE(3, "05"),
+		JUMP_IF_FALSE(3, "06"),
+		LESS_THAN(4, "07"),
+		EQUALS(4, "08"),
+		STOP(1, "99");
 	}
 }
 
